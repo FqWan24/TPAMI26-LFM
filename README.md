@@ -1,9 +1,7 @@
-# Codes of Facilitating Multimodal Classification via Dynamically Learning Modality Gap
+# Codes of Understanding Multimodal Learning from Modality Fusion and Alignment Perspectives
 
 
-Here is the official PyTorch implementation of ''*Facilitating Multimodal Classification via Dynamically Learning Modality Gap*''
-
-**Paper Title: "Facilitating Multimodal Classification via Dynamically Learning Modality Gap"**
+**Paper Title: "Understanding Multimodal Learning from Modality Fusion and Alignment Perspectives"**
 
 For replication inquiries or issues, feel free to contact us via email at [wfq011207@163.com] or [fqwan@njust.edu.cn].
 
