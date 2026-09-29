@@ -35,6 +35,7 @@ def compute_mAP(outputs, labels):
         AP.append(average_precision_score(y_true[:, i], y_pred[:, i]))
     return np.mean(AP)
 
+
 def Alignment(p, q):
     p = F.softmax(p, dim=-1)
     q = F.softmax(q, dim=-1)
@@ -43,6 +44,50 @@ def Alignment(p, q):
     kl_q_m = F.kl_div(q.log(), m, reduction='batchmean')
     js_score = 0.5 * (kl_p_m + kl_q_m)
     return js_score
+
+def ContrastiveAlignment(a_f, v_f, temperature=0.07):
+    """
+    Positive:
+        audio_i <-> visual_i
+
+    Negative:
+        audio_i <-> visual_j, i != j
+    """
+
+    if a_f.dim() > 2:
+        a_f = a_f.flatten(start_dim=2).mean(dim=-1)
+
+    if v_f.dim() > 2:
+        v_f = v_f.flatten(start_dim=2).mean(dim=-1)
+    if a_f.size(1) != v_f.size(1):
+        raise ValueError(
+            f"Feature dimensions must match for contrastive alignment: "
+            f"a_f={a_f.shape}, v_f={v_f.shape}"
+        )
+    a_f = F.normalize(a_f, p=2, dim=1)
+    v_f = F.normalize(v_f, p=2, dim=1)
+    logits = torch.matmul(a_f, v_f.T) / temperature
+
+    batch_size = a_f.size(0)
+
+    targets = torch.arange(
+        batch_size,
+        device=a_f.device
+    )
+    loss_a2v = F.cross_entropy(
+        logits,
+        targets
+    )
+    loss_v2a = F.cross_entropy(
+        logits.T,
+        targets
+    )
+    loss = 0.5 * (
+        loss_a2v + loss_v2a
+    )
+
+    return loss
+
 
 def getAlpha_Learnable_Fitted(epoch):
     # Alpha with Learnable learning is fitted with functions
